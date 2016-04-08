@@ -59,37 +59,47 @@ loadData <- function(fileName){
         return(dataList)
 }
 
-makePlot3 <- function(data){
-        # Of the four types of sources indicated by the type (point, nonpoint,
-        # onroad, nonroad) variable, which of these four sources have seen
-        # decreases in emissions from 1999-2008 for Baltimore City? Which have
-        # seen increases in emissions from 1999-2008? Use the ggplot2 plotting
-        # system to make a plot answer this question.
+makePlot6 <- function(data){
+        # How have emissions from motor vehicle sources changed from 1999-2008 
+        # in Baltimore City?
         
         message("- making plot")
         
         # define options 
-        titleString <- "Total PM2.5 emission in Baltimore City, Maryland"
+        titleString <- "Emissions from motor vehicle sources in Baltimore (24510)
+        and Los Angeles (06037)"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
+        places <- c("24510","06037")
+        #& NEI$fips==place,
+        #select = c(Emissions, year,type))%>% 
+        
+        
+        
+        motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
+        motorVehiclesSCC <- unique(SCC$SCC[motorVehicles])
+        
+        
         years <- c(1999,2002,2005,2008)
-        place <- "24510"
         
-        df <- subset(NEI,
-                     NEI$year %in% years & NEI$fips==place,
-                     select = c(Emissions, year,type))%>% 
-                group_by(year,type) %>%
-                summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
+        df <- subset(NEI,    NEI$year %in% years &
+                             NEI$SCC %in% motorVehiclesSCC &
+                             NEI$fips %in% places,
+                     select = c(Emissions, fips))%>% 
+                group_by(fips)
         df<-ungroup(df)
-        
+        #levels(df$fips) <- c(24510="Baltimure",06037="LA") 
         localenv <- environment()
-        g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~type)
-        print(g)
-                   
+        g <- ggplot(df,aes(factor(fips),log10(df$Emissions))) 
+        g <- g + geom_point() + geom_boxplot()  + 
+                labs(title = titleString) +labs(y = expression("log "* Emissions))
+
         message("- plot completed")
+        print(g)
+        
         return(g)
+        
 }
 
 
@@ -114,7 +124,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot3.png", width = 960, height = 480)
-makePlot3(NEI)
+png(filename ="plot6.png", width = 480, height = 480)
+makePlot6(NEI)
 dev.off()
 

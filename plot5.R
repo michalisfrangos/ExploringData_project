@@ -59,37 +59,44 @@ loadData <- function(fileName){
         return(dataList)
 }
 
-makePlot3 <- function(data){
-        # Of the four types of sources indicated by the type (point, nonpoint,
-        # onroad, nonroad) variable, which of these four sources have seen
-        # decreases in emissions from 1999-2008 for Baltimore City? Which have
-        # seen increases in emissions from 1999-2008? Use the ggplot2 plotting
-        # system to make a plot answer this question.
+makePlot5 <- function(data){
+        # How have emissions from motor vehicle sources changed from 1999-2008 
+        # in Baltimore City?
         
         message("- making plot")
         
         # define options 
-        titleString <- "Total PM2.5 emission in Baltimore City, Maryland"
+        titleString <- "Emissions from motor vehicle sources in Baltimore City"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
-        years <- c(1999,2002,2005,2008)
         place <- "24510"
+        #select = c(Emissions, year,type))%>% 
         
-        df <- subset(NEI,
-                     NEI$year %in% years & NEI$fips==place,
-                     select = c(Emissions, year,type))%>% 
-                group_by(year,type) %>%
+        
+        motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
+        motorVehiclesSCC <- unique(SCC$SCC[motorVehicles])
+        
+        
+        years <- c(1999,2002,2005,2008)
+        
+        df <- subset(NEI,    NEI$year %in% years &
+                             NEI$SCC %in% motorVehiclesSCC &
+                             NEI$fips==place,
+                     select = c(Emissions, year))%>% 
+                group_by(year) %>%
                 summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
         df<-ungroup(df)
         
         localenv <- environment()
         g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~type)
+        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type)
         print(g)
-                   
+        
         message("- plot completed")
+        
         return(g)
+        
 }
 
 
@@ -114,7 +121,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot3.png", width = 960, height = 480)
-makePlot3(NEI)
+png(filename ="plot5.png", width = 480, height = 480)
+makePlot5(NEI)
 dev.off()
 

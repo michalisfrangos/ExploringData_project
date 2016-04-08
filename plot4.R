@@ -59,37 +59,54 @@ loadData <- function(fileName){
         return(dataList)
 }
 
-makePlot3 <- function(data){
-        # Of the four types of sources indicated by the type (point, nonpoint,
-        # onroad, nonroad) variable, which of these four sources have seen
-        # decreases in emissions from 1999-2008 for Baltimore City? Which have
-        # seen increases in emissions from 1999-2008? Use the ggplot2 plotting
-        # system to make a plot answer this question.
+makePlot4 <- function(data){
+        # Across the United States, how have emissions from coal
+        # combustion-related sources changed from 1999-2008?
         
         message("- making plot")
         
         # define options 
-        titleString <- "Total PM2.5 emission in Baltimore City, Maryland"
+        titleString <- "Emissions from coal combustion-related sources in the USA"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
-        years <- c(1999,2002,2005,2008)
-        place <- "24510"
         
-        df <- subset(NEI,
-                     NEI$year %in% years & NEI$fips==place,
-                     select = c(Emissions, year,type))%>% 
-                group_by(year,type) %>%
+        coalCombustion <-(grep("[Cc]oal",SCC$Short.Name) %in%
+                                  grep("[Cc]omb",SCC$Short.Name)) |
+                         (grep("[Cc]oal",SCC$Short.Name) %in%
+                                  grep("[Ff]uel",SCC$Short.Name))|
+                         (grep("[Cc]oal",SCC$Short.Name) %in%
+                          grep("[Ff]ired",SCC$Short.Name))
+        
+        coalCombustionSCC <- unique(SCC$SCC[coalCombustion])
+        
+        years <- c(1999,2002,2005,2008)
+        
+        df <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
+                     select = c(Emissions, year))%>% 
+                group_by(year) %>%
                 summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
         df<-ungroup(df)
         
         localenv <- environment()
         g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~type)
+        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type)
         print(g)
-                   
+        
         message("- plot completed")
-        return(g)
+        
+        #place <- "24510"
+        #& NEI$fips==place,
+        #select = c(Emissions, year,type))%>% 
+        
+        
+        # For motor vehicles, I think Highway Vehicles is a good search term.
+        # Also, using ONROAD type gives almost same result as Highway Vehicles 
+        # in SCC Short Name
+        #motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name,value = TRUE)
+        #index <- SCC$Short.Name %in% motorVehicles
+        #return(g)
+        
 }
 
 
@@ -114,7 +131,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot3.png", width = 960, height = 480)
-makePlot3(NEI)
+png(filename ="plot4.png", width = 480, height = 480)
+makePlot4(NEI)
 dev.off()
 
