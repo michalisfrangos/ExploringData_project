@@ -4,7 +4,7 @@
 # frangos@frangos.eu
 
 # set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_courseraproject'
+script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
 
 # Set working directory
 #script.dir <- dirname(sys.frame(1)$ofile)
@@ -12,10 +12,11 @@ setwd(script.dir)
 
 #rm(list = ls()) 
 
-library(R.utils)
+#library(R.utils)
 library(httr)
 library(plyr)
 library(dplyr)
+library(ggplot2)
 
 
 ## DOWNLOADING and UNZIPING DATA Function
@@ -80,17 +81,15 @@ makePlot3 <- function(data){
                      select = c(Emissions, year,type))%>% 
                 group_by(year,type) %>%
                 summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
+        df<-ungroup(df)
         
-        plot(df$year,df$totalEmissions,col = df$year,
-             xlim = c(1998,2009), ylim = range(df$totalEmission), 
-             pch = 20, lwd = 10,
-             main = titleString,
-             xlab = xlabelString, ylab = ylableString)
-        
-        model <-lm(totalEmissions~year,df)
-        abline(model,lwd = 2,col = 'blue')
-        
+        localenv <- environment()
+        g <- ggplot(df,aes(year,totalEmissions))
+        g <- g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~type)
+        print(g)
+                   
         message("- plot completed")
+        return(g)
 }
 
 
@@ -115,7 +114,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-# png(filename ="plot3.png", width = 480, height = 480)
+png(filename ="plot3.png", width = 960, height = 480)
 makePlot3(NEI)
-#dev.off()
+dev.off()
 
