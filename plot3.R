@@ -1,8 +1,6 @@
 # Data Science Course,  Exploratory data analysis project week 4
 # Michalis Frangos ; frangos@frangos.eu
 
-library(dplyr)
-library(ggplot2)
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
@@ -55,9 +53,9 @@ makePlot3 <- function(NEI){
         return(g)
 }
 
-
-
 ## MAKING PLOTS
+library(dplyr)
+library(ggplot2)
 
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"

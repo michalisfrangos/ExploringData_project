@@ -1,8 +1,6 @@
 # Data Science Course,  Exploratory data analysis project week 4
 # Michalis Frangos ; frangos@frangos.eu
 
-library(dplyr)
-library(ggplot2)
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
@@ -55,6 +53,10 @@ makePlot4 <- function(NEI,SCC){
 }
 
 ## MAKING PLOTS
+
+library(dplyr)
+library(ggplot2)
+
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"
@@ -71,7 +73,7 @@ if(!exists("NEI") | !exists("SCC")){
 
 graphics.off() 
 message("- data loaded")
-png(filename ="plot4.png", width = 840, height = 480)
+png(filename ="plot4.png", width = 960, height = 480)
 makePlot4(NEI,SCC)
 dev.off()
 

@@ -2,7 +2,7 @@
 # Michalis Frangos ; frangos@frangos.eu
 #rm(list = ls())  # clear workspace
 
-library(dplyr)
+
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
@@ -56,6 +56,8 @@ makePlot2 <- function(NEI){
 }
 
 ## MAKING PLOTS
+library(dplyr)
+
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"

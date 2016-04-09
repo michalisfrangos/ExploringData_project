@@ -4,9 +4,6 @@
 # clear workspace
 #rm(list = ls()) 
 
-library(httr)
-library(dplyr)
-
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
     zipFileDir <- "./downloads/project_data.zip"
@@ -47,6 +44,8 @@ makePlot1 <- function(NEI){
 }
 
 ## MAKING PLOTS
+library(httr)
+library(dplyr)
 
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
