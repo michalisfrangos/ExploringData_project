@@ -59,50 +59,43 @@ loadData <- function(fileName){
         return(dataList)
 }
 
-makePlot6 <- function(data){
-        # How have emissions from motor vehicle sources changed from 1999-2008 
-        # in Baltimore City?
+makePlot4 <- function(data){
+        # Across the United States, how have emissions from coal
+        # combustion-related sources changed from 1999-2008?
         
         message("- making plot")
         
         # define options 
-        titleString <- "Emissions from motor vehicle sources in Baltimore (24510)
-        and Los Angeles (06037)"
+        titleString <- "Emissions from coal combustion-related sources in the USA"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
-        places <- c("24510","06037")
-
+        coalCombustion <- grepl("[Cc]oal",SCC$EI.Sector) &
+                          grepl("[Cc]omb",SCC$EI.Sector)
+                                 
         
-        
-        motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
-        motorVehiclesSCC <- unique(SCC$SCC[motorVehicles])
-        
+        coalCombustionSCC <- unique(SCC$SCC[coalCombustion])
         
         years <- c(1999,2002,2005,2008)
         
-        df <- subset(NEI,    NEI$year %in% years &
-                             NEI$SCC %in% motorVehiclesSCC &
-                             NEI$fips %in% places,
-                     select = c(Emissions, year,fips))%>% 
-                group_by(year,fips) %>%
+        dfNEI <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
+                     select = c(Emissions, year))
+        
+        dfSCC <- subset(SCC,coalCombustion, select = c(SCC,EI.Sector))
+        
+        df<-merge(dfNEI,dfSCC)%>%
+                group_by(year,EI.Sector)%>%
                 summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
-        df<-ungroup(df)
-        df$fips[df$fips=="06037"]= "LA"
-        df$fips[df$fips=="24510"]= "Baltimore"
+        
         localenv <- environment()
-        g <- ggplot(df,aes(year,totalEmissions,group=fips)) 
-        g <- g + geom_point(aes(color=fips,size = 2)) + 
-                geom_boxplot(outlier.colour = NA, fill = NA) +facet_grid(.~fips)+
-                labs(title = titleString) +labs(y = "Emissions")
-
-        message("- plot completed")
+        g <- ggplot(df,aes(year,totalEmissions,group = EI.Sector,color = EI.Sector)) + 
+                labs(title = titleString)
+        g <- g + geom_point() +geom_line() 
         print(g)
         
-        return(g)
+        message("- plot completed")
         
 }
-
 
 
 ## MAKING PLOTS
@@ -114,7 +107,7 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 0
+flagLoad <- 1
 if (flagLoad==1){
         message("- loading data (takes some time)")
         NEI <- readRDS("summarySCC_PM25.rds")
@@ -125,7 +118,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot6.png", width = 480, height = 480)
-makePlot6(NEI)
-dev.off()
+#png(filename ="plot4.png", width = 480, height = 480)
+makePlot4(NEI)
+#dev.off()
 

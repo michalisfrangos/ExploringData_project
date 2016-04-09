@@ -4,7 +4,7 @@
 # frangos@frangos.eu
 
 # set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_courseraproject'
+script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
 
 # Set working directory
 #script.dir <- dirname(sys.frame(1)$ofile)
@@ -44,7 +44,6 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
 }
 
 
-
 ## LOADING DATA; returns a list of data frames
 loadData <- function(fileName){
 
@@ -60,20 +59,13 @@ loadData <- function(fileName){
 }
 
 
-
 makePlot1 <- function(data){
-        # Have total emissions from PM2.5 decreased in the United States 
-        # from 1999 to 2008? Using the base plotting system, make a plot showing
-        # the total PM2.5 emission from all sources for each of the years 1999,
-        # 2002, 2005, and 2008.
-        
+
         message("- making plot")
         
-        # define options 
         titleString <- "Total PM2.5 emission from all sources for each year"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
-        
         
         years <- c(1999,2002,2005,2008)
 
@@ -96,7 +88,6 @@ makePlot1 <- function(data){
 
 
 ## MAKING PLOTS
-
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"
@@ -111,7 +102,6 @@ if (flagLoad==1){
         SCC <- readRDS("Source_Classification_Code.rds")
         message("- data loaded")
 }
-
 
 
 

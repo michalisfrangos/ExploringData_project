@@ -59,56 +59,31 @@ loadData <- function(fileName){
         return(dataList)
 }
 
-makePlot4 <- function(data){
-        # Across the United States, how have emissions from coal
-        # combustion-related sources changed from 1999-2008?
-        
-        message("- making plot")
-        
+makePlot4 <- function(data){ 
+        # Across the United States, how have emissions from coal 
+        # combustion-related sources changed from 1999-2008? message("- making plot") 
         # define options 
-        titleString <- "Emissions from coal combustion-related sources in the USA"
+        titleString <- "Emissions from coal combustion-related sources in the USA" 
         xlabelString <- "Year" 
-        ylableString <- "Total Emissons"
+        ylableString <- "Total Emissons" 
         
+        coalCombustion <-(grep("[Cc]oal",SCC$Short.Name) %in% grep("[Cc]omb",SCC$Short.Name)) | 
+                (grep("[Cc]oal",SCC$Short.Name) %in% grep("[Ff]uel",SCC$Short.Name))| 
+                (grep("[Cc]oal",SCC$Short.Name) %in% grep("[Ff]ired",SCC$Short.Name)) 
         
-        coalCombustion <-(grep("[Cc]oal",SCC$Short.Name) %in%
-                                  grep("[Cc]omb",SCC$Short.Name)) |
-                         (grep("[Cc]oal",SCC$Short.Name) %in%
-                                  grep("[Ff]uel",SCC$Short.Name))|
-                         (grep("[Cc]oal",SCC$Short.Name) %in%
-                          grep("[Ff]ired",SCC$Short.Name))
-        
-        coalCombustionSCC <- unique(SCC$SCC[coalCombustion])
-        
+        coalCombustionSCC <- unique(SCC$SCC[coalCombustion]) 
         years <- c(1999,2002,2005,2008)
-        
         df <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
-                     select = c(Emissions, year))%>% 
-                group_by(year) %>%
+                     select = c(Emissions, year))%>% group_by(year) %>% 
                 summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
-        df<-ungroup(df)
         
-        localenv <- environment()
-        g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type)
+        df<-ungroup(df) 
+        localenv <- environment() 
+        g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString) 
+        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type) 
         print(g)
-        
-        message("- plot completed")
-        
-        #place <- "24510"
-        #& NEI$fips==place,
-        #select = c(Emissions, year,type))%>% 
-        
-        
-        # For motor vehicles, I think Highway Vehicles is a good search term.
-        # Also, using ONROAD type gives almost same result as Highway Vehicles 
-        # in SCC Short Name
-        #motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name,value = TRUE)
-        #index <- SCC$Short.Name %in% motorVehicles
-        #return(g)
-        
+        message("- plot completed") 
 }
-
 
 
 ## MAKING PLOTS
@@ -120,7 +95,7 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 0
+flagLoad <- 1
 if (flagLoad==1){
         message("- loading data (takes some time)")
         NEI <- readRDS("summarySCC_PM25.rds")
@@ -131,7 +106,7 @@ if (flagLoad==1){
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot4.png", width = 480, height = 480)
+#png(filename ="plot4.png", width = 480, height = 480)
 makePlot4(NEI)
-dev.off()
+#dev.off()
 
