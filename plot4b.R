@@ -41,6 +41,16 @@ makePlot4 <- function(data){
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
+        
+        
+        coalCombustionSCC <- unique(SCC$SCC[coalCombustion]) 
+        years <- c(1999,2002,2005,2008)
+        df <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
+                     select = c(Emissions, year))%>% group_by(year) %>% 
+            summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
+        
+
+        
         coalCombustion <- grepl("[Cc]oal",SCC$EI.Sector) &
                           grepl("[Cc]omb",SCC$EI.Sector)
                                  
