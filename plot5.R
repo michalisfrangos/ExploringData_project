@@ -1,20 +1,6 @@
 # Data Science Course,  Exploratory data analysis project week 4
+# Michalis Frangos ; frangos@frangos.eu
 
-# Michalis Frangos
-# frangos@frangos.eu
-
-# set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
-
-# Set working directory
-#script.dir <- dirname(sys.frame(1)$ofile)
-setwd(script.dir)
-
-#rm(list = ls()) 
-
-#library(R.utils)
-library(httr)
-library(plyr)
 library(dplyr)
 library(ggplot2)
 
@@ -44,21 +30,6 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
 }
 
 
-
-## LOADING DATA; returns a list of data frames
-loadData <- function(fileName){
-        
-        message("- loading data (takes some time)")
-        
-        ## read each of the two files using the readRDS() function in R 
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
-        dataList <- list(NEI,SCC)
-        
-        message("- data loaded")
-        return(dataList)
-}
-
 makePlot5 <- function(data){
         # How have emissions from motor vehicle sources changed from 1999-2008 
         # in Baltimore City?
@@ -77,7 +48,6 @@ makePlot5 <- function(data){
         motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
         motorVehiclesSCC <- unique(SCC$SCC[motorVehicles])
         
-        
         years <- c(1999,2002,2005,2008)
         
         df <- subset(NEI,    NEI$year %in% years &
@@ -90,7 +60,7 @@ makePlot5 <- function(data){
         
         localenv <- environment()
         g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type)
+        g <- g + geom_point() + geom_smooth(se = FALSE,method = "lm") 
         print(g)
         
         message("- plot completed")
@@ -99,10 +69,7 @@ makePlot5 <- function(data){
         
 }
 
-
-
 ## MAKING PLOTS
-
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"
@@ -110,18 +77,17 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 0
-if (flagLoad==1){
-        message("- loading data (takes some time)")
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
+if(!exists("NEI") | !exists("SCC")){
+    message("- loading data (takes some time)")
+    NEI <- readRDS("summarySCC_PM25.rds")
+    SCC <- readRDS("Source_Classification_Code.rds")
+    message("- data loaded")
 }
-
 
 graphics.off() 
 message("- data loaded")
 
-png(filename ="plot5.png", width = 480, height = 480)
+png(filename ="plot5.png", width = 840, height = 480)
 makePlot5(NEI)
 dev.off()
 

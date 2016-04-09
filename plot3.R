@@ -1,23 +1,7 @@
 # Data Science Course,  Exploratory data analysis project week 4
+# Michalis Frangos ; frangos@frangos.eu
 
-# Michalis Frangos
-# frangos@frangos.eu
-
-# set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
-
-# Set working directory
-#script.dir <- dirname(sys.frame(1)$ofile)
-setwd(script.dir)
-
-#rm(list = ls()) 
-
-#library(R.utils)
-library(httr)
-library(plyr)
-library(dplyr)
 library(ggplot2)
-
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
@@ -41,22 +25,6 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
                 message("- data file exists")      
         }
         
-}
-
-
-
-## LOADING DATA; returns a list of data frames
-loadData <- function(fileName){
-        
-        message("- loading data (takes some time)")
-        
-        ## read each of the two files using the readRDS() function in R 
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
-        dataList <- list(NEI,SCC)
-        
-        message("- data loaded")
-        return(dataList)
 }
 
 makePlot3 <- function(data){
@@ -84,8 +52,9 @@ makePlot3 <- function(data){
         df<-ungroup(df)
         
         localenv <- environment()
-        g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString)
-        g <- g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~type)
+        g <- ggplot(df,aes(year,totalEmissions,color = type)) + labs(title = titleString)
+        g <- g + geom_point() + geom_smooth(se = FALSE,method = "lm") +
+             facet_grid(.~type)
         print(g)
                    
         message("- plot completed")
@@ -103,13 +72,12 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 0
-if (flagLoad==1){
-        message("- loading data (takes some time)")
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
+if(!exists("NEI") | !exists("SCC")){
+    message("- loading data (takes some time)")
+    NEI <- readRDS("summarySCC_PM25.rds")
+    SCC <- readRDS("Source_Classification_Code.rds")
+    message("- data loaded")
 }
-
 
 graphics.off() 
 message("- data loaded")

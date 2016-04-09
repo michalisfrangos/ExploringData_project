@@ -1,20 +1,7 @@
 # Data Science Course,  Exploratory data analysis project week 4
-
-# Michalis Frangos
-# frangos@frangos.eu
-
-# set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
-
-# Set working directory
-#script.dir <- dirname(sys.frame(1)$ofile)
-setwd(script.dir)
-
+# Michalis Frangos ;  frangos@frangos.eu
 #rm(list = ls()) 
 
-#library(R.utils)
-library(httr)
-library(plyr)
 library(dplyr)
 library(ggplot2)
 
@@ -41,22 +28,6 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
                 message("- data file exists")      
         }
         
-}
-
-
-
-## LOADING DATA; returns a list of data frames
-loadData <- function(fileName){
-        
-        message("- loading data (takes some time)")
-        
-        ## read each of the two files using the readRDS() function in R 
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
-        dataList <- list(NEI,SCC)
-        
-        message("- data loaded")
-        return(dataList)
 }
 
 makePlot4 <- function(data){
@@ -94,12 +65,10 @@ makePlot4 <- function(data){
         print(g)
         
         message("- plot completed")
-        
 }
 
 
 ## MAKING PLOTS
-
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"
@@ -107,11 +76,11 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 1
-if (flagLoad==1){
-        message("- loading data (takes some time)")
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
+if(!exists("NEI") | !exists("SCC")){
+    message("- loading data (takes some time)")
+    NEI <- readRDS("summarySCC_PM25.rds")
+    SCC <- readRDS("Source_Classification_Code.rds")
+    message("- data loaded")
 }
 
 

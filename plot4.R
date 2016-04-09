@@ -1,23 +1,8 @@
 # Data Science Course,  Exploratory data analysis project week 4
+# Michalis Frangos ; frangos@frangos.eu
 
-# Michalis Frangos
-# frangos@frangos.eu
-
-# set working directory
-script.dir <- 'D:/FRANGOS_FOLDER/CoursesCertificates/Coursera_Spec_DataAnalysis_2016/ExploratoryDataAnalysis/ExploringData_project'
-
-# Set working directory
-#script.dir <- dirname(sys.frame(1)$ofile)
-setwd(script.dir)
-
-#rm(list = ls()) 
-
-#library(R.utils)
-library(httr)
-library(plyr)
 library(dplyr)
 library(ggplot2)
-
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
@@ -40,24 +25,8 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
         } else {
                 message("- data file exists")      
         }
-        
 }
 
-
-
-## LOADING DATA; returns a list of data frames
-loadData <- function(fileName){
-        
-        message("- loading data (takes some time)")
-        
-        ## read each of the two files using the readRDS() function in R 
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
-        dataList <- list(NEI,SCC)
-        
-        message("- data loaded")
-        return(dataList)
-}
 
 makePlot4 <- function(data){ 
         # Across the United States, how have emissions from coal 
@@ -67,10 +36,9 @@ makePlot4 <- function(data){
         xlabelString <- "Year" 
         ylableString <- "Total Emissons" 
         
-        coalCombustion <-(grep("[Cc]oal",SCC$Short.Name) %in% grep("[Cc]omb",SCC$Short.Name)) | 
-                (grep("[Cc]oal",SCC$Short.Name) %in% grep("[Ff]uel",SCC$Short.Name))| 
-                (grep("[Cc]oal",SCC$Short.Name) %in% grep("[Ff]ired",SCC$Short.Name)) 
-        
+        coalCombustion <- grepl("[Cc]oal",SCC$Short.Name)  &
+                          grepl("[Cc]omb",SCC$Short.Name)
+                            
         coalCombustionSCC <- unique(SCC$SCC[coalCombustion]) 
         years <- c(1999,2002,2005,2008)
         df <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
@@ -80,14 +48,13 @@ makePlot4 <- function(data){
         df<-ungroup(df) 
         localenv <- environment() 
         g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString) 
-        g <- g + geom_point() + geom_smooth(method = "lm") # + facet_grid(.~type) 
+        g <- g  +geom_point() +  geom_line(colour = "blue") # geom_smooth(se = FALSE, method = "lm") 
         print(g)
         message("- plot completed") 
 }
 
 
 ## MAKING PLOTS
-
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 zipFileName <- "exdata_data_NEI_data.zip"
 fileName1 <- "summarySCC_PM25.rds"
@@ -95,18 +62,17 @@ fileName2 <- "Source_Classification_Code.rds"
 
 downloadDataFile(fileUrl,zipFileName,fileName1,fileName2)
 
-flagLoad <- 1
-if (flagLoad==1){
-        message("- loading data (takes some time)")
-        NEI <- readRDS("summarySCC_PM25.rds")
-        SCC <- readRDS("Source_Classification_Code.rds")
+if(!exists("NEI") | !exists("SCC")){
+    message("- loading data (takes some time)")
+    NEI <- readRDS("summarySCC_PM25.rds")
+    SCC <- readRDS("Source_Classification_Code.rds")
+    message("- data loaded")
 }
-
 
 graphics.off() 
 message("- data loaded")
 
-#png(filename ="plot4.png", width = 480, height = 480)
+png(filename ="plot4.png", width = 480, height = 480)
 makePlot4(NEI)
-#dev.off()
+dev.off()
 
