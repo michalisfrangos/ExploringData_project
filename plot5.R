@@ -4,7 +4,6 @@
 library(dplyr)
 library(ggplot2)
 
-
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
         zipFileDir <- "./downloads/project_data.zip"
@@ -14,44 +13,37 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
                 download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
                 dateDownloaded <- date()
                 message("- data downloaded")
-                #file.remove("./downloads/project_data.zip")
-        } else {
-                message("- data already downloaded")  
+        } else {message("- data already downloaded")  
         }
-        
         if  (!file.exists(fileName1)|!file.exists(fileName2)){
                 message("- unzipping data")
                 unzip("./downloads/project_data.zip")
                 message("- data unzipped")
-        } else {
-                message("- data file exists")      
+        } else { message("- data file exists")      
         }
-        
 }
 
 
-makePlot5 <- function(data){
+makePlot5 <- function(NEI,SCC){
         # How have emissions from motor vehicle sources changed from 1999-2008 
         # in Baltimore City?
-        
+    
         message("- making plot")
-        
-        # define options 
         titleString <- "Emissions from motor vehicle sources in Baltimore City"
         xlabelString <- "Year" 
         ylableString <- "Total Emissons"
         
         place <- "24510"
-        #select = c(Emissions, year,type))%>% 
-        
-        
-        motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
+        typeTransport  <- "ON-ROAD"
+        motorVehicles <- grep("[Vv]eh",SCC$Short.Name)
+        #motorVehicles <- grep("([H]ighway *[Vv]eh)",SCC$Short.Name)
         motorVehiclesSCC <- unique(SCC$SCC[motorVehicles])
         
         years <- c(1999,2002,2005,2008)
         
         df <- subset(NEI,    NEI$year %in% years &
                              NEI$SCC %in% motorVehiclesSCC &
+                             NEI$type %in% typeTransport &
                              NEI$fips==place,
                      select = c(Emissions, year))%>% 
                 group_by(year) %>%
@@ -88,6 +80,6 @@ graphics.off()
 message("- data loaded")
 
 png(filename ="plot5.png", width = 840, height = 480)
-makePlot5(NEI)
+makePlot5(NEI,SCC)
 dev.off()
 

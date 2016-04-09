@@ -1,33 +1,27 @@
 # Data Science Course,  Exploratory data analysis project week 4
 # Michalis Frangos ; frangos@frangos.eu
 
+library(dplyr)
 library(ggplot2)
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
-        zipFileDir <- "./downloads/project_data.zip"
-        if (!file.exists("downloads") |(file.exists("downloads") & !file.exists(zipFileDir))){
-                message("- downloading data")
-                dir.create("downloads")
-                download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
-                dateDownloaded <- date()
-                message("- data downloaded")
-                #file.remove("./downloads/project_data.zip")
-        } else {
-                message("- data already downloaded")  
-        }
-        
-        if  (!file.exists(fileName1)|!file.exists(fileName2)){
-                message("- unzipping data")
-                unzip("./downloads/project_data.zip")
-                message("- data unzipped")
-        } else {
-                message("- data file exists")      
-        }
-        
+    zipFileDir <- "./downloads/project_data.zip"
+    if (!file.exists("downloads") |(file.exists("downloads") & !file.exists(zipFileDir))){
+        message("- downloading data")
+        dir.create("downloads")
+        download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
+        dateDownloaded <- date()
+        message("- data downloaded")
+    } else {message("- data already downloaded")}
+    if  (!file.exists(fileName1)|!file.exists(fileName2)){
+        message("- unzipping data")
+        unzip("./downloads/project_data.zip")
+        message("- data unzipped")
+    } else {message("- data file exists")}
 }
 
-makePlot3 <- function(data){
+makePlot3 <- function(NEI){
         # Of the four types of sources indicated by the type (point, nonpoint,
         # onroad, nonroad) variable, which of these four sources have seen
         # decreases in emissions from 1999-2008 for Baltimore City? Which have
@@ -81,7 +75,6 @@ if(!exists("NEI") | !exists("SCC")){
 
 graphics.off() 
 message("- data loaded")
-
 png(filename ="plot3.png", width = 960, height = 480)
 makePlot3(NEI)
 dev.off()

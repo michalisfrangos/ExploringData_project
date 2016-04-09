@@ -13,22 +13,16 @@ downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
                 download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
                 dateDownloaded <- date()
                 message("- data downloaded")
-                #file.remove("./downloads/project_data.zip")
-        } else {
-                message("- data already downloaded")  
-        }
-        
+        } else {message("- data already downloaded")}
         if  (!file.exists(fileName1)|!file.exists(fileName2)){
                 message("- unzipping data")
                 unzip("./downloads/project_data.zip")
                 message("- data unzipped")
-        } else {
-                message("- data file exists")      
-        }
+        } else {message("- data file exists")}
 }
 
 
-makePlot4 <- function(data){ 
+makePlot4 <- function(NEI,SCC){ 
         # Across the United States, how have emissions from coal 
         # combustion-related sources changed from 1999-2008? message("- making plot") 
         # define options 
@@ -36,23 +30,29 @@ makePlot4 <- function(data){
         xlabelString <- "Year" 
         ylableString <- "Total Emissons" 
         
-        coalCombustion <- grepl("[Cc]oal",SCC$Short.Name)  &
-                          grepl("[Cc]omb",SCC$Short.Name)
-                            
-        coalCombustionSCC <- unique(SCC$SCC[coalCombustion]) 
-        years <- c(1999,2002,2005,2008)
-        df <- subset(NEI,NEI$year %in% years & NEI$SCC %in% coalCombustionSCC,
-                     select = c(Emissions, year))%>% group_by(year) %>% 
-                summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
+        # get combustion names with codes and make a data frame
+        coalCombustion <- grepl("[Cc]oal",SCC$EI.Sector)  &
+                          grepl("[Cc]omb",SCC$EI.Sector)
+        dfSCC <- subset(SCC,coalCombustion,select = c(SCC,EI.Sector)) %>%
+            droplevels()  # remove unusef factor levels
         
+        #coalCombustionSCC <- unique(SCC$SCC[coalCombustion]) 
+        years <- c(1999,2002,2005,2008)
+        dfNEI <- subset(NEI,NEI$year %in% years & NEI$SCC %in% dfSCC$SCC,
+                           select = c(Emissions, SCC, year))
+
+        df <- merge(dfNEI,dfSCC,by.x = "SCC",by.y = "SCC") %>%
+            group_by(year,EI.Sector) %>%
+            summarise(totalEmissions=sum(Emissions, na.rm=TRUE))
+    
         df<-ungroup(df) 
         localenv <- environment() 
         g <- ggplot(df,aes(year,totalEmissions)) + labs(title = titleString) 
-        g <- g  +geom_point() +  geom_line(colour = "blue") # geom_smooth(se = FALSE, method = "lm") 
+        g <- g  +geom_point(aes(color=EI.Sector)) +  geom_line(aes(color=EI.Sector)) + 
+            facet_grid(.~EI.Sector)# geom_smooth(se = FALSE, method = "lm") 
         print(g)
         message("- plot completed") 
 }
-
 
 ## MAKING PLOTS
 fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
@@ -71,8 +71,7 @@ if(!exists("NEI") | !exists("SCC")){
 
 graphics.off() 
 message("- data loaded")
-
-png(filename ="plot4.png", width = 480, height = 480)
-makePlot4(NEI)
+png(filename ="plot4.png", width = 840, height = 480)
+makePlot4(NEI,SCC)
 dev.off()
 

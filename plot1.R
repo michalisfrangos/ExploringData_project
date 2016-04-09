@@ -9,28 +9,22 @@ library(dplyr)
 
 ## DOWNLOADING and UNZIPING DATA Function
 downloadDataFile <- function(fileUrl,zipFileName,fileName1,fileName2){
-        zipFileDir <- "./downloads/project_data.zip"
-        if (!file.exists("downloads") |(file.exists("downloads") & !file.exists(zipFileDir))){
-                message("- downloading data")
-                dir.create("downloads")
-                download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
-                dateDownloaded <- date()
-                message("- data downloaded")
-                #file.remove("./downloads/project_data.zip")
-        } else {
-                message("- data already downloaded")  
-        }
-
-        if  (!file.exists(fileName1)|!file.exists(fileName2)){
-                message("- unzipping data")
-                unzip("./downloads/project_data.zip")
-                message("- data unzipped")
-        } else {
-                message("- data file exists")      
-        }
+    zipFileDir <- "./downloads/project_data.zip"
+    if (!file.exists("downloads") |(file.exists("downloads") & !file.exists(zipFileDir))){
+        message("- downloading data")
+        dir.create("downloads")
+        download.file(fileUrl,destfile = "./downloads/project_data.zip",method = "auto") 
+        dateDownloaded <- date()
+        message("- data downloaded")
+    } else {message("- data already downloaded")}
+    if  (!file.exists(fileName1)|!file.exists(fileName2)){
+        message("- unzipping data")
+        unzip("./downloads/project_data.zip")
+        message("- data unzipped")
+    } else {message("- data file exists")}
 }
 
-makePlot1 <- function(data){
+makePlot1 <- function(NEI){
         message("- making plot")
         titleString <- "Total PM2.5 emission from all sources for each year"
         xlabelString <- "Year" 
